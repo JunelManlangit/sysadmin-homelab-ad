@@ -1,0 +1,66 @@
+SysAdmin Lab Documentation Author: Junel
+
+1.  Active Directory & Domain Setup Domain Controller:
+
+-   Hostname: SRV1
+-   Domain: domain.local
+-   IP: 192.168.1.101
+-   Subnet: 255.255.255.0
+-   Gateway: None
+-   DNS: 192.168.1.101
+
+Client: - Hostname: client1 - IP: DHCP - DNS: 192.168.1.101
+
+2.  DHCP Setup
+
+-   Scope: 192.168.1.100–192.168.1.200
+-   Mask: 255.255.255.0
+-   DNS option: 192.168.1.101
+
+3.  DNS Configuration
+
+-   Forward Zone: domain.local
+-   Reverse Zone: 1.168.192.in-addr.arpa
+-   A Records, PTR Records, CNAME Records
+-   Forwarders: 8.8.8.8, 1.1.1.1
+
+4.  IPv6 Issue Fix
+
+-   Disabled IPv6 because DNS was responding with ::1
+-   Forced system to use IPv4-only
+
+5.  PowerShell Toolkit Features:
+
+-   Create-Users (CSV)
+-   Check-Services
+-   System-Info
+-   Network-Test
+-   Menu interface
+
+6.  Remote Management
+
+-   Enabled PSRemoting
+-   Invoke-Command works
+-   Get-Process -ComputerName blocked by DCOM/WMI
+
+7.  File Server + FSRM
+
+-   Shared folder
+-   Quotas configured
+
+8.  Shadow Copies
+
+-   Enabled volume snapshots
+-   Allows file restore (like server Ctrl+Z)
+
+9.  Troubleshooting Done
+
+-   DNS broken
+-   Forwarders failing
+-   Wrong gateway
+-   IPv6 interference
+-   Remote management troubleshooting
+
+10. Final Network Diagram SRV1 (192.168.1.101) — Internal Network —
+    client1 (192.168.1.102) SRV1 also has NAT adapter for internet
+    access.
