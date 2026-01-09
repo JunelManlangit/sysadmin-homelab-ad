@@ -1,0 +1,218 @@
+# Active Directory Installation & Configuration  
+**Home Lab – Windows Server 2019/2022**  
+Author: **Junel Manlangit**
+
+This document describes the full setup of my Active Directory Domain Services (AD DS) home lab running on VirtualBox.  
+The environment includes:
+
+- **Domain Controller:** Windows Server (SRV1)
+- **Domain Name:** domain.local
+- **Client Machine:** Windows 10
+- **Network:** Host-Only / Internal Network (VirtualBox)
+- **DNS/DHCP:** DNS on SRV1, DHCP on client (default)
+
+---
+
+# 1. Windows Server Configuration (SRV1)
+
+## ✔ Server Hostname
+```
+SRV1
+```
+
+## ✔ Static IP Configuration
+```
+IP Address:       192.168.1.101
+Subnet Mask:      255.255.255.0
+Default Gateway:  (left blank)
+Preferred DNS:    192.168.1.101
+```
+
+### 🔎 Why no default gateway?
+Because this lab uses an **isolated host-only network**, internet routing isn’t needed.  
+DNS must always point to **the Domain Controller itself**, not to Google DNS.
+
+---
+
+# 2. Installing Active Directory Domain Services
+
+### Step-by-step:
+1. Open **Server Manager**
+2. Click **Add Roles and Features**
+3. Select:
+   - **Active Directory Domain Services**
+   - DNS automatically included
+4. Install the role
+5. Click the yellow warning icon → **Promote this server to a domain controller**
+
+---
+
+# 3. Creating a New Forest
+
+### Domain Setup:
+```
+Root Domain Name: domain.local
+```
+
+Other settings:
+- Forest functional level: Windows Server 2016/2019  
+- Domain functional level: Windows Server 2016/2019  
+- DNS server: enabled  
+- Global Catalog: enabled  
+- DSRM password: (your password)
+
+After installation, the server restarts.
+
+---
+
+# 4. Post-Deployment Verification
+
+### Run the following tests:
+
+#### Check domain:
+```
+ping domain.local
+ping SRV1.domain.local
+```
+
+#### Check DNS:
+```
+nslookup domain.local
+```
+
+#### Verify AD:
+Open:
+```
+Administrative Tools → Active Directory Users and Computers
+```
+
+You should see:
+```
+domain.local
+│
+├── Builtin
+├── Users
+├── Computers
+└── Domain Controllers
+```
+
+---
+
+# 5. Organizational Unit (OU) Structure
+
+Created in **Active Directory Users and Computers**:
+
+```
+domain.local
+│
+├── IT
+├── HR
+├── Finance
+├── Sales
+└── TestOU
+```
+
+Stored in:  
+📁 `/docs/OU-Structure.md`
+
+---
+
+# 6. Windows 10 Client Configuration (Client01)
+
+## ✔ Network Settings
+The client VM is set to:
+
+- **Obtain IP address automatically (DHCP)**
+- **Preferred DNS Server: 192.168.1.101**
+
+Example configuration:
+```
+IP Address:       Assigned by SRV1 or VirtualBox DHCP
+DNS Server:       192.168.1.101
+```
+
+### 🔎 Why DNS must point to SRV1?
+Because **domain join will fail** if DNS points to Google or your ISP.
+
+---
+
+# 7. Joining Windows 10 to the Domain
+
+1. Open **Settings → System → About**
+2. Click **Rename this PC (Advanced)**
+3. Select **Join a domain**
+4. Enter:
+```
+domain.local
+```
+5. Provide domain credentials:
+```
+Administrator (domain admin)
+```
+6. Restart computer
+
+After reboot, sign in using:
+```
+domain\yourusername
+```
+
+### Verification:
+- PC appears in **AD Users and Computers → Computers**
+- GPO applies correctly
+- DNS resolves domain.local
+
+---
+
+# 8. Testing the Environment
+
+### ✔ Test login with domain accounts  
+Create a test user in **TestOU** and log in at the client.
+
+### ✔ Test DNS  
+```
+nslookup domain.local
+nslookup SRV1
+```
+
+### ✔ Test GPO application  
+Run:
+```
+gpupdate /force
+gpresult /r
+```
+
+### ✔ Test file share permissions  
+(Create shared folder on SRV1 later in file-server-backup-lab repo)
+
+---
+
+# 9. Home Lab Summary
+
+| Component | Configuration |
+|----------|---------------|
+| Domain Controller | SRV1 |
+| Domain Name | domain.local |
+| Server IP | 192.168.1.101 |
+| DNS Server | 192.168.1.101 |
+| Client PC | Windows 10 |
+| Client IP | DHCP |
+| Client DNS | 192.168.1.101 |
+| Hypervisor | VirtualBox |
+
+---
+
+# ✔ Completed and Functional
+Your AD environment is **fully operational** and ready for:
+
+- Group Policy hardening  
+- DHCP/DNS integration  
+- File server roles  
+- PowerShell automation  
+- Portfolio screenshots  
+
+---
+
+# 📬 Author
+**Junel Manlangit**  
+System Administrator (Home Lab)  
+GitHub: https://github.com/JunelManlangit
