@@ -1,0 +1,120 @@
+# Organizational Unit (OU) Structure  
+Author: **Junel**
+
+This document describes the organizational unit (OU) structure used in my Active Directory home lab.  
+The OU layout is designed to mimic a real-world environment with proper separation of departments, policies, and administrative boundaries.
+
+---
+
+# 1. OU Structure Overview
+
+The following OU hierarchy was created under the domain **domain.local**:
+
+```
+domain.local
+│
+├── IT
+├── HR
+├── Finance
+├── Sales
+└── TestOU
+```
+
+Each OU is intended for grouping users, computers, or testing policies.
+
+---
+
+# 2. Purpose of Each OU
+
+### **IT**
+Used for:
+- IT staff accounts  
+- Elevated permissions  
+- Testing admin-level GPOs  
+- Storing scripts or service accounts  
+
+### **HR**
+Used for:
+- HR employee accounts  
+- GPO rules such as restricted access  
+- Folder permissions for sensitive data  
+
+### **Finance**
+Used for:
+- Finance staff  
+- File share permission management  
+- Testing access-based enumeration  
+
+### **Sales**
+Used for:
+- Sales representatives  
+- Basic workstation permissions  
+- Light GPO configurations  
+
+### **TestOU**
+Used for:
+- Testing new users  
+- Testing GPOs safely  
+- PowerShell automation scripts (bulk user creation)  
+- Experimenting with permissions and login restrictions  
+
+This OU is intentionally isolated to avoid affecting other departments.
+
+---
+
+# 3. Distinguished Names (DNs)
+
+These are the exact Distinguished Names used in the lab:
+
+```
+OU=IT,DC=domain,DC=local
+OU=HR,DC=domain,DC=local
+OU=Finance,DC=domain,DC=local
+OU=Sales,DC=domain,DC=local
+OU=TestOU,DC=domain,DC=local
+```
+
+PowerShell scripts use these DN paths when creating users.
+
+---
+
+# 4. OU Creation Steps
+
+Created using **Active Directory Users and Computers (ADUC)**:
+
+1. Right-click **domain.local**
+2. Select **New → Organizational Unit**
+3. Enter OU name (e.g., "IT")
+4. Repeat for each department
+5. Confirm "Protect container from accidental deletion" is checked
+
+---
+
+# 5. Verifying OU Structure
+
+Use the following commands to verify:
+
+### ✔ PowerShell verification
+```
+Get-ADOrganizationalUnit -Filter * | Select-Object Name, DistinguishedName
+```
+
+### ✔ GUI verification
+Open:
+```
+Active Directory Users and Computers
+```
+
+Navigate to:
+```
+domain.local
+  ├─ IT
+  ├─ HR
+  ├─ Finance
+  ├─ Sales
+  └─ TestOU
+```
+
+---
+
+# ✔ OU Structure Complete
