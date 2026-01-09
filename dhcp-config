@@ -1,0 +1,105 @@
+# DHCP Configuration – Home Lab  
+Author: **Junel**
+
+This document describes how DHCP is used in my Active Directory home lab.
+
+---
+
+# 1. DHCP Role Setup
+
+DHCP was configured to provide IP addresses for internal devices.
+
+### **DHCP Scope Used**
+```
+Range: 192.168.1.100 – 192.168.1.200
+Subnet Mask: 255.255.255.0
+DNS Server Option: 192.168.1.101
+```
+
+DHCP ensures client1 receives an IP automatically, while still using the domain controller for DNS.
+
+---
+
+# 2. Client Configuration (client1)
+
+The Windows 10 client:
+
+- Obtains IP using **DHCP**
+- Has **manual DNS** configured:
+
+```
+Preferred DNS: 192.168.1.101
+```
+
+Reason:  
+VirtualBox/Automatic DHCP will assign wrong DNS (e.g., 192.168.1.1), which breaks:
+
+- Domain join  
+- GPO processing  
+- Authentication  
+- SRV1 hostname resolution  
+
+Your manual DNS override ensures proper domain functionality.
+
+---
+
+# 3. DHCP Lease Behavior
+
+Example lease:
+```
+client1
+IP: 192.168.1.102
+Gateway: (empty or VirtualBox default)
+DNS: 192.168.1.101
+```
+
+Functionality confirmed using:
+
+- `ipconfig /release`
+- `ipconfig /renew`
+- `ipconfig /all`
+
+---
+
+# 4. DHCP Troubleshooting Completed
+
+You successfully identified and fixed:
+
+### ❌ Wrong Gateway  
+DHCP was assigning a gateway that wasn’t part of the internal network.  
+✔ Fixed by removing gateway requirement in isolated labs.
+
+### ❌ DNS override needed  
+DHCP was not configured to hand out the domain controller as DNS.  
+✔ Fixed by manually setting DNS on client and/or DHCP option.
+
+### ❌ DNS not working with IPv6  
+DNS responded using IPv6 (::1).  
+✔ Fixed by disabling IPv6.
+
+---
+
+# 5. Summary
+
+DHCP provides:
+
+- Automatic IP assignment  
+- Controlled address range  
+- Stable internal network  
+- Integration with Active Directory via correct DNS settings  
+
+DNS is **always** pointed to SRV1:
+```
+192.168.1.101
+```
+
+This ensures:
+- Domain join success  
+- GPO application  
+- Login authentication  
+- Name resolution stability  
+
+---
+
+# ✔ DHCP is working correctly  
+Client obtains IP automatically, and DNS is correctly pointed to SRV1.
