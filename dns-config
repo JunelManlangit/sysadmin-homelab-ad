@@ -1,0 +1,118 @@
+# DNS Configuration – Home Lab  
+Author: **Junel**
+
+This document describes the actual DNS configuration used in my Windows Server Active Directory home lab.
+
+---
+
+# 1. DNS Server Information
+
+- **Server Name:** SRV1  
+- **Domain:** domain.local  
+- **IPv4 Address:** 192.168.1.101  
+- **DNS Server:** 192.168.1.101 (self-hosted)  
+
+DNS role was installed automatically when the server was promoted to a Domain Controller.
+
+---
+
+# 2. DNS Zones
+
+### ✔ Forward Lookup Zone  
+```
+domain.local
+```
+
+### ✔ Reverse Lookup Zone  
+```
+1.168.192.in-addr.arpa
+```
+
+These zones allow:
+- Name → IP resolution  
+- IP → Name (PTR) resolution  
+
+---
+
+# 3. DNS Records Used
+
+The lab includes:
+
+### ✔ **A Records**
+- SRV1 → 192.168.1.101  
+- client1 → 192.168.1.102  
+
+### ✔ **PTR Records**
+- 192.168.1.101 → SRV1.domain.local  
+- 192.168.1.102 → client1.domain.local  
+
+### ✔ **CNAME Records**
+Created for testing and convenience (optional).
+
+### ✔ **SRV Records**
+Automatically created by AD:
+- `_ldap`
+- `_kerberos`
+
+These are critical for domain join and authentication.
+
+---
+
+# 4. DNS Forwarders
+
+The following external DNS servers were configured:
+
+- **8.8.8.8** (Google DNS)  
+- **1.1.1.1** (Cloudflare)  
+
+Used to resolve **internet** domains.  
+Internal names are resolved inside domain.local.
+
+---
+
+# 5. IPv6 Interference Issue (Important)
+
+During setup, DNS responded with the IPv6 loopback address:
+
+```
+::1
+```
+
+This caused:
+- incorrect DNS resolution  
+- slow or failing lookups  
+- domain join problems  
+
+### ✔ **Fix Implemented**
+- Fully disabled **IPv6** on SRV1  
+- Forced Windows Server to use **IPv4-only**
+
+After disabling IPv6, DNS responded correctly with:
+```
+192.168.1.101
+```
+
+---
+
+# 6. DNS Troubleshooting Done
+
+You successfully troubleshooted the following issues:
+
+### ❌ DNS forwarding failure  
+✔ Fixed by resetting forwarders.
+
+### ❌ Broken DNS zone  
+✔ Reconstructed Forward / Reverse zones.
+
+### ❌ Incorrect gateway entry  
+✔ Identified that gateway is not needed in isolated labs.
+
+### ❌ IPv6 responses breaking DNS  
+✔ Disabled IPv6 to enforce IPv4 resolution.
+
+### ❌ client1 resolving wrong DNS  
+✔ Ensured client DNS manually set to SRV1 only.
+
+---
+
+# ✔ DNS is fully operational
